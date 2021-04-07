@@ -1,80 +1,89 @@
 package main
 
 import (
-	"os"
-	"io"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"os"
 )
 
 func main() {
 	/*
-	拷贝文件：
-	 */
-	srcFile := "/Users/ruby/Documents/pro/a/guliang.jpeg"
-	destFile := "guliang3.jpeg"
+		拷贝文件：
+	*/
+	srcFile := "/Users/tyf/Project/go/Golang-100-Days/guliang.jpeg"
+	destFile := "/Users/tyf/Project/go/Golang-100-Days/guliang3.jpeg"
 	//total,err := CopyFile1(srcFile,destFile)
 	//total,err := CopyFile2(srcFile,destFile)
-	total,err := CopyFile3(srcFile,destFile)
-	fmt.Println(total,err)
+	total, err := CopyFile4(srcFile, destFile)
+	fmt.Println(total, err)
 }
 
-func CopyFile3(srcFile,destFile string)(int,error){
-	bs,err := ioutil.ReadFile(srcFile)
-	if err != nil{
-		return 0,err
+func CopyFile4(srcFile, destFile string) (int, error) {
+	if bytes, err := ioutil.ReadFile(srcFile); err != nil {
+		return 0, err
+	} else {
+		if err1 := ioutil.WriteFile(destFile, bytes, 0777); err1 != nil {
+			return 0, err1
+		}
+		return len(bytes), nil
 	}
-	err = ioutil.WriteFile(destFile,bs,0777)
-	if err != nil{
-		return 0,err
-	}
-	return len(bs),nil
 }
 
-func CopyFile2(srcFile,destFile string)(int64,error){
-	file1,err := os.Open(srcFile)
-	if err != nil{
-		return 0,err
+func CopyFile3(srcFile, destFile string) (int, error) {
+	bs, err := ioutil.ReadFile(srcFile)
+	if err != nil {
+		return 0, err
 	}
-	file2,err := os.OpenFile(destFile,os.O_WRONLY|os.O_CREATE,os.ModePerm)
-	if err != nil{
-		return 0,err
+	err = ioutil.WriteFile(destFile, bs, 0777)
+	if err != nil {
+		return 0, err
+	}
+	return len(bs), nil
+}
+
+func CopyFile2(srcFile, destFile string) (int64, error) {
+	file1, err := os.Open(srcFile)
+	if err != nil {
+		return 0, err
+	}
+	file2, err := os.OpenFile(destFile, os.O_WRONLY|os.O_CREATE, os.ModePerm)
+	if err != nil {
+		return 0, err
 	}
 	defer file1.Close()
 	defer file2.Close()
-	return io.Copy(file2,file1)
+	return io.Copy(file2, file1)
 }
 
-
 //该函数：用于通过io操作实现文件的拷贝，返回值是拷贝的总数量(字节),错误
-func CopyFile1(srcFile,destFile string)(int,error){
-	file1,err :=os.Open(srcFile)
-	if err != nil{
-		return 0,err
+func CopyFile1(srcFile, destFile string) (int, error) {
+	file1, err := os.Open(srcFile)
+	if err != nil {
+		return 0, err
 	}
-	file2,err := os.OpenFile(destFile,os.O_WRONLY|os.O_CREATE,os.ModePerm)
-	if err != nil{
-		return 0,err
+	file2, err := os.OpenFile(destFile, os.O_WRONLY|os.O_CREATE, os.ModePerm)
+	if err != nil {
+		return 0, err
 	}
 	defer file1.Close()
 	defer file2.Close()
 
 	//读写
-	bs := make([]byte,1024,1024)
+	bs := make([]byte, 1024, 1024)
 	n := -1 //读取的数据量
 	total := 0
-	for{
-		n,err = file1.Read(bs)
-		if err == io.EOF || n==0{
+	for {
+		n, err = file1.Read(bs)
+		if err == io.EOF || n == 0 {
 			fmt.Println("拷贝完毕。。")
 			break
-		}else if err != nil{
+		} else if err != nil {
 			fmt.Println("报错了。。")
-			return total,err
+			return total, err
 		}
 		total += n
 		file2.Write(bs[:n])
 	}
-	return total,nil
+	return total, nil
 }
-
